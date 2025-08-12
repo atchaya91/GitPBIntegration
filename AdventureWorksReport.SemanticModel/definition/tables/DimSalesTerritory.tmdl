@@ -1,0 +1,57 @@
+table DimSalesTerritory
+	lineageTag: eec55d94-8300-4928-a240-e8239e1dd2fa
+
+	column SalesTerritoryKey
+		dataType: int64
+		formatString: 0
+		lineageTag: fb6a7469-48be-459c-8cc7-a67c40acdb02
+		summarizeBy: none
+		sourceColumn: SalesTerritoryKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesTerritoryAlternateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ef6891d-02d7-490f-9bf1-2807d374ab87
+		summarizeBy: none
+		sourceColumn: SalesTerritoryAlternateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesTerritoryRegion
+		dataType: string
+		lineageTag: 88884a88-7d3c-479b-8b4d-f05f60ed81ad
+		summarizeBy: none
+		sourceColumn: SalesTerritoryRegion
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesTerritoryCountry
+		dataType: string
+		lineageTag: d8ec167c-5e02-40b2-855d-e903b2b222b4
+		summarizeBy: none
+		sourceColumn: SalesTerritoryCountry
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesTerritoryGroup
+		dataType: string
+		lineageTag: d8db42f7-c212-42e7-9958-43034db87e95
+		summarizeBy: none
+		sourceColumn: SalesTerritoryGroup
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimSalesTerritory = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\DimSalesTerritory.csv"),[Delimiter="|", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SalesTerritoryKey", Int64.Type}, {"SalesTerritoryAlternateKey", Int64.Type}, {"SalesTerritoryRegion", type text}, {"SalesTerritoryCountry", type text}, {"SalesTerritoryGroup", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

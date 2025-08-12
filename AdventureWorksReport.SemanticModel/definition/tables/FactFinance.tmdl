@@ -1,0 +1,151 @@
+table FactFinance
+	lineageTag: f2ef834e-ce84-49a1-a600-f941193122ca
+
+	measure Actuals = ```
+			
+			CALCULATE(
+			    SUM(FactFinance[Amount]),
+			    FILTER(DimScenario, DimScenario[ScenarioName] = "Actual")
+			)
+			
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 2d626b98-186a-4d3f-a941-25d539ed624f
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure Budget =
+			
+			CALCULATE(
+			    SUM(FactFinance[Amount]),
+			    FILTER(DimScenario, DimScenario[ScenarioName] = "Budget")
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 3c2c65fc-f3fe-4eb6-89bb-2a136dcc0772
+
+	measure Variance = ```
+			
+			SWITCH(
+			    TRUE(),
+			    SELECTEDVALUE(DimAccount[AccountType]) = "Expenditures", [Budget] - [Actuals],
+			    SELECTEDVALUE(DimAccount[AccountType]) = "Revenue", [Actuals] - [Budget],
+			    [Actuals] - [Budget]  -- default
+			)
+			
+			```
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: a30ac7f8-80b4-41a2-b084-0486eb4c9849
+
+	measure 'Variance %' = ```
+			
+			VAR Actual = [Actuals]
+			VAR Budget = [Budget]
+			VAR AccountType = SELECTEDVALUE(DimAccount[AccountType])
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        AccountType = "Revenue" && Budget <> 0,
+			            DIVIDE(Budget - Actual, Budget),
+			        Actual <> 0,
+			            DIVIDE(Actual - Budget, Actual),
+			        BLANK()
+			    )
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 41d20ea1-c2ae-4711-b878-4b2f9677482e
+
+	column FinanceKey
+		dataType: int64
+		formatString: 0
+		lineageTag: ca73a4e4-0222-4d11-a60b-7569a3580184
+		summarizeBy: count
+		sourceColumn: FinanceKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ddbc977-bd35-4021-9661-c763ab7257f1
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrganizationKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 0d65e213-59d6-40f0-9112-7da8c86bd216
+		summarizeBy: none
+		sourceColumn: OrganizationKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentGroupKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d8879cd-7552-4ab3-bff2-f2c6c6e7fa65
+		summarizeBy: none
+		sourceColumn: DepartmentGroupKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 95a5870f-be4d-4c98-9268-ed3de79a6213
+		summarizeBy: none
+		sourceColumn: ScenarioKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 5e84d7b4-d4f1-46fe-a340-1d98a6bac432
+		summarizeBy: none
+		sourceColumn: AccountKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: double
+		lineageTag: eca32d26-827e-4647-9ea3-075475d473b5
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Date
+		dataType: dateTime
+		formatString: Mm-dd-yyyy
+		lineageTag: 047c8ccc-85af-4346-8ffe-9c82f024dbdb
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: e61ff49d-228d-404e-8685-c7d6fcc55df9
+			defaultHierarchy: LocalDateTable_433a0145-800c-4a8c-8b77-1825b613efc8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	partition FactFinance = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Fact_Tables\FactFinance.csv"),[Delimiter=",", Columns=8, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"FinanceKey", Int64.Type}, {"DateKey", Int64.Type}, {"OrganizationKey", Int64.Type}, {"DepartmentGroupKey", Int64.Type}, {"ScenarioKey", Int64.Type}, {"AccountKey", Int64.Type}, {"Amount", type number}, {"Date", type date}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

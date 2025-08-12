@@ -1,0 +1,40 @@
+table DimDepartmentGroup
+	lineageTag: fa8572d3-031c-4926-b203-bba3005f7c22
+
+	column DepartmentGroupKey
+		dataType: int64
+		formatString: 0
+		lineageTag: a4eacb5d-7861-435d-bf72-3ddffa4c0f0f
+		summarizeBy: none
+		sourceColumn: DepartmentGroupKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentDepartmentGroupKey
+		dataType: string
+		lineageTag: 2cae6c8a-a1d2-424a-aa99-9dc90d946573
+		summarizeBy: none
+		sourceColumn: ParentDepartmentGroupKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentGroupName
+		dataType: string
+		lineageTag: 77768b52-3c40-4a3d-91c8-8a2ef146175f
+		summarizeBy: none
+		sourceColumn: DepartmentGroupName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDepartmentGroup = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimDepartmentGroup.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"DepartmentGroupKey", Int64.Type}, {"ParentDepartmentGroupKey", type text}, {"DepartmentGroupName", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

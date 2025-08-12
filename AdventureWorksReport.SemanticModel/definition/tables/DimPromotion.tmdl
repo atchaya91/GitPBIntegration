@@ -1,0 +1,114 @@
+table DimPromotion
+	lineageTag: e6e3d953-1e08-40fb-8311-badd0ae5396c
+
+	column PromotionKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 7dcc8cab-8e96-4ff5-bbc5-85a4f6da409f
+		summarizeBy: none
+		sourceColumn: PromotionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column PromotionAlternateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: a0a4445e-d365-4f5f-8b2f-76ab970f60bd
+		summarizeBy: count
+		sourceColumn: PromotionAlternateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column PromotionName
+		dataType: string
+		lineageTag: da5fb5c4-7cba-4ad8-b085-9df1552ffa57
+		summarizeBy: none
+		sourceColumn: PromotionName
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiscountPct
+		dataType: double
+		lineageTag: 8dcc42a7-ec5b-48ff-8e66-1f1e3c1e9320
+		summarizeBy: sum
+		sourceColumn: DiscountPct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column EnglishPromotionType
+		dataType: string
+		lineageTag: 0bb46c1b-8adf-407e-9cde-44ef12490cda
+		summarizeBy: none
+		sourceColumn: EnglishPromotionType
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnglishPromotionCategory
+		dataType: string
+		lineageTag: 05d040d9-f553-40ea-b35d-b81c56bbc8af
+		summarizeBy: none
+		sourceColumn: EnglishPromotionCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d4de4974-bf74-4a3a-a1f1-228b1ca55107
+		summarizeBy: none
+		sourceColumn: StartDate
+
+		variation Variation
+			isDefault
+			relationship: 80b0b6d2-af8e-4617-91a3-135c95a1170b
+			defaultHierarchy: LocalDateTable_00f9ba30-b8f9-4f1e-9f8c-330da1b700bd.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f1c79c88-6df5-448c-a806-ddd84dd23f7a
+		summarizeBy: none
+		sourceColumn: EndDate
+
+		variation Variation
+			isDefault
+			relationship: 03f8a09a-a74d-44b0-8024-a1249dd4cb7c
+			defaultHierarchy: LocalDateTable_100f4822-7075-4c02-8e94-44f9cbb41e8b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MinQty
+		dataType: int64
+		formatString: 0
+		lineageTag: 9c26bd86-e96c-40dd-b321-ec39adcd596e
+		summarizeBy: sum
+		sourceColumn: MinQty
+
+		annotation SummarizationSetBy = Automatic
+
+	column MaxQty
+		dataType: int64
+		formatString: 0
+		lineageTag: d699698b-f9c1-40f3-afe9-080a8700f144
+		summarizeBy: sum
+		sourceColumn: MaxQty
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimPromotion = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimPromotion.csv"),[Delimiter=",", Columns=10, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"PromotionKey", Int64.Type}, {"PromotionAlternateKey", Int64.Type}, {"EnglishPromotionName", type text}, {"DiscountPct", type number}, {"EnglishPromotionType", type text}, {"EnglishPromotionCategory", type text}, {"StartDate", type datetime}, {"EndDate", type datetime}, {"MinQty", Int64.Type}, {"MaxQty", Int64.Type}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"EnglishPromotionName", "PromotionName"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

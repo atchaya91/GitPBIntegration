@@ -1,0 +1,59 @@
+table DimOrganization
+	lineageTag: a14f300d-815a-445a-8bf1-e9533e0d7e8f
+
+	column OrganizationKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ca8506e-ab69-45a5-a7ac-d8085593bbef
+		summarizeBy: none
+		sourceColumn: OrganizationKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentOrganizationKey
+		dataType: string
+		lineageTag: d2aff83d-cef3-475d-9fca-60cabd23c6e6
+		summarizeBy: none
+		sourceColumn: ParentOrganizationKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column PercentageOfOwnership
+		dataType: double
+		lineageTag: 9e24c22c-569a-46e3-bb6b-55fc8bfd31b6
+		summarizeBy: none
+		sourceColumn: PercentageOfOwnership
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column OrganizationName
+		dataType: string
+		lineageTag: 7a1d837a-3da8-40f1-8088-e00a32202957
+		summarizeBy: none
+		sourceColumn: OrganizationName
+
+		annotation SummarizationSetBy = Automatic
+
+	column CurrencyKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 4fa6cb53-db0d-4c7f-93a5-a0156c24a9a7
+		summarizeBy: none
+		sourceColumn: CurrencyKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimOrganization = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimOrganization.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"OrganizationKey", Int64.Type}, {"ParentOrganizationKey", type text}, {"PercentageOfOwnership", type number}, {"OrganizationName", type text}, {"CurrencyKey", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,89 @@
+table DimGeography
+	lineageTag: adb6e13e-eb96-4ead-8d87-74e1f660a092
+
+	column GeographyKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 6cb35f17-b8c7-402d-9b8a-6c4420345fe9
+		summarizeBy: count
+		sourceColumn: GeographyKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 6314f09e-9798-4746-96c3-4eed76c44557
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column StateProvinceCode
+		dataType: string
+		lineageTag: c5a5f89f-82fd-495a-93c4-2d9b7c4325b7
+		summarizeBy: none
+		sourceColumn: StateProvinceCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column StateProvinceName
+		dataType: string
+		lineageTag: 866fba4b-5871-409b-91a2-0ea7093a112c
+		summarizeBy: none
+		sourceColumn: StateProvinceName
+
+		annotation SummarizationSetBy = Automatic
+
+	column CountryRegionCode
+		dataType: string
+		lineageTag: cdb46018-02b8-4917-b2a2-16d90cfec275
+		summarizeBy: none
+		sourceColumn: CountryRegionCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnglishCountryRegionName
+		dataType: string
+		lineageTag: bc744e38-16fa-4b1d-8639-b13f4cf9d8f8
+		summarizeBy: none
+		sourceColumn: EnglishCountryRegionName
+
+		annotation SummarizationSetBy = Automatic
+
+	column PostalCode
+		dataType: string
+		lineageTag: efc66ffb-baa5-4367-82f5-1ff474a5b8a4
+		summarizeBy: none
+		sourceColumn: PostalCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesTerritoryKey
+		dataType: int64
+		formatString: 0
+		lineageTag: b497189a-8a29-4cb0-abe7-30bbe0b97e2b
+		summarizeBy: count
+		sourceColumn: SalesTerritoryKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column IpAddressLocator
+		dataType: string
+		lineageTag: 2750e77c-4509-441d-b1f3-ed2bd5949965
+		summarizeBy: none
+		sourceColumn: IpAddressLocator
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimGeography = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimGeography.csv"),[Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"GeographyKey", Int64.Type}, {"City", type text}, {"StateProvinceCode", type text}, {"StateProvinceName", type text}, {"CountryRegionCode", type text}, {"EnglishCountryRegionName", type text}, {"PostalCode", type text}, {"SalesTerritoryKey", Int64.Type}, {"IpAddressLocator", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

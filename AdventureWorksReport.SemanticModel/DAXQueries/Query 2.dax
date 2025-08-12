@@ -1,0 +1,35 @@
+DEFINE
+	VAR __DS0Core = 
+		SUMMARIZECOLUMNS(
+			ROLLUPADDISSUBTOTAL(
+				ROLLUPGROUP(
+					'DimProduct1'[Product],
+					'DimProduct1'[DimProductCategory.ProductCategoryName],
+					'DimProduct1'[DimProductSubcategory.ProductSubcategory]
+				), "IsGrandTotalRowTotal"
+			),
+			"Total_Sales", 'FactInternetSales'[Total Sales]
+		)
+
+	VAR __DS0PrimaryWindowed = 
+		TOPN(
+			502,
+			__DS0Core,
+			[IsGrandTotalRowTotal],
+			0,
+			'DimProduct1'[Product],
+			1,
+			'DimProduct1'[DimProductCategory.ProductCategoryName],
+			1,
+			'DimProduct1'[DimProductSubcategory.ProductSubcategory],
+			1
+		)
+
+EVALUATE
+	__DS0PrimaryWindowed
+
+ORDER BY
+	[IsGrandTotalRowTotal] DESC,
+	'DimProduct1'[Product],
+	'DimProduct1'[DimProductCategory.ProductCategoryName],
+	'DimProduct1'[DimProductSubcategory.ProductSubcategory]

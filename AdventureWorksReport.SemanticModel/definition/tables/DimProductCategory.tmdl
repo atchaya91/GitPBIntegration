@@ -1,0 +1,41 @@
+table DimProductCategory
+	lineageTag: 3fd3cb25-60a5-46e0-bf2c-70d204169c5d
+
+	column ProductCategoryKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 75ebdf08-c85b-49c1-83c5-46f7ba3de1b1
+		summarizeBy: none
+		sourceColumn: ProductCategoryKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCategoryAlternateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: d15ce380-a9a4-426a-8cb6-1b39fca8c75c
+		summarizeBy: none
+		sourceColumn: ProductCategoryAlternateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCategoryName
+		dataType: string
+		lineageTag: 13038b27-3e71-4535-96f0-dc050bf686b5
+		summarizeBy: none
+		sourceColumn: ProductCategoryName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProductCategory = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimProductCategory.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductCategoryKey", Int64.Type}, {"ProductCategoryAlternateKey", Int64.Type}, {"ProductCategoryName", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

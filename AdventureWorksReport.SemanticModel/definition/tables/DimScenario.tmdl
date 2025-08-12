@@ -1,0 +1,32 @@
+table DimScenario
+	lineageTag: 8ca47790-6c51-41bb-b15c-98dc7b26dd11
+
+	column ScenarioKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 66be287a-1e4d-49d2-bccf-19159804df8a
+		summarizeBy: none
+		sourceColumn: ScenarioKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioName
+		dataType: string
+		lineageTag: f9a8aa23-fc71-4e8f-af2a-70bbd51d8f69
+		summarizeBy: none
+		sourceColumn: ScenarioName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimScenario = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\DimScenario.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ScenarioKey", Int64.Type}, {"ScenarioName", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

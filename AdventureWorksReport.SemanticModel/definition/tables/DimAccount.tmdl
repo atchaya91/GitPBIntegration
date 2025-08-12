@@ -1,0 +1,113 @@
+table DimAccount
+	lineageTag: 6c9a7595-18f6-4c5e-9985-98773fe73d57
+
+	measure 'YoY Growth(%)' = ```
+			
+			VAR CurrentSales = [Total Sales]
+			VAR LastYearSales = [Total Sales SPLY]
+			RETURN
+			IF(
+			    NOT ISBLANK(LastYearSales),
+			    DIVIDE(CurrentSales - LastYearSales, LastYearSales),
+			    BLANK()
+			)
+			
+			```
+		lineageTag: c0b8cc9b-6bce-419f-b900-4ee2bf243e7b
+
+	column AccountKey
+		dataType: int64
+		formatString: 0
+		lineageTag: fb213200-8eb7-4f17-bbab-a5926e9c0ccc
+		summarizeBy: none
+		sourceColumn: AccountKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentAccountKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f3bf4b0-50e9-4bf3-8737-5f1c12e6283b
+		summarizeBy: none
+		sourceColumn: ParentAccountKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountCodeAlternateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: fb9fea51-3b82-4220-b13f-4b02a605fb3e
+		summarizeBy: none
+		sourceColumn: AccountCodeAlternateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParentAccountCodeAlternateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 13bc84d1-e69f-49ef-ace5-cae621b4a91f
+		summarizeBy: none
+		sourceColumn: ParentAccountCodeAlternateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountDescription
+		dataType: string
+		lineageTag: bc2ae1de-f997-45d5-8295-71d10eb07c86
+		summarizeBy: none
+		sourceColumn: AccountDescription
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountType
+		dataType: string
+		lineageTag: 98227750-9455-4d68-94f7-e1a6eeba9f65
+		summarizeBy: none
+		sourceColumn: AccountType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Operator
+		dataType: string
+		lineageTag: a31cfb1b-cebf-4e52-af46-fd825c7a1e18
+		summarizeBy: none
+		sourceColumn: Operator
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomMembers
+		dataType: string
+		lineageTag: d0f40064-467e-4e38-b9bd-21be6cbb0055
+		summarizeBy: none
+		sourceColumn: CustomMembers
+
+		annotation SummarizationSetBy = Automatic
+
+	column ValueType
+		dataType: string
+		lineageTag: f0b66df5-d5e5-4dc3-a1d0-4cbcfca29166
+		summarizeBy: none
+		sourceColumn: ValueType
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomMemberOptions
+		dataType: string
+		lineageTag: 6877aea0-38ff-46b4-8ea6-4b758426fc4e
+		summarizeBy: none
+		sourceColumn: CustomMemberOptions
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimAccount = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimAccount.csv"),[Delimiter=",", Columns=10, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"AccountKey", Int64.Type}, {"ParentAccountKey", Int64.Type}, {"AccountCodeAlternateKey", Int64.Type}, {"ParentAccountCodeAlternateKey", Int64.Type}, {"AccountDescription", type text}, {"AccountType", type text}, {"Operator", type text}, {"CustomMembers", type text}, {"ValueType", type text}, {"CustomMemberOptions", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,40 @@
+table DimCurrency
+	lineageTag: 54334acc-7eab-45c2-bc32-4a79f4a4cce6
+
+	column CurrencyKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 76dfbd93-cc2d-4305-bdf8-cdcb67141b8d
+		summarizeBy: none
+		sourceColumn: CurrencyKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CurrencyAlternateKey
+		dataType: string
+		lineageTag: ca956621-2b6e-4bea-a387-9b7d4426b469
+		summarizeBy: none
+		sourceColumn: CurrencyAlternateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CurrencyName
+		dataType: string
+		lineageTag: 79323e41-cd39-451a-8430-494c235211ad
+		summarizeBy: none
+		sourceColumn: CurrencyName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCurrency = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimCurrency.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"CurrencyKey", Int64.Type}, {"CurrencyAlternateKey", type text}, {"CurrencyName", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
