@@ -677,7 +677,7 @@ cultureInfo en-IN
 			      "Definition": {
 			        "Binding": {
 			          "ConceptualEntity": "DimAccount",
-			          "ConceptualProperty": "AccountDescription"
+			          "ConceptualProperty": "AccountDesc"
 			        }
 			      },
 			      "State": "Generated",
@@ -25095,7 +25095,9 @@ cultureInfo en-IN
 			            "Weight": 0.491
 			          }
 			        },
-			        {},
+			        {
+			          "": {}
+			        },
 			        {
 			          "set-up": {
 			            "Type": "Noun",

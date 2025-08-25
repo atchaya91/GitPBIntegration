@@ -51,11 +51,11 @@ table DimAccount
 
 		annotation SummarizationSetBy = Automatic
 
-	column AccountDescription
+	column AccountDesc
 		dataType: string
 		lineageTag: bc2ae1de-f997-45d5-8295-71d10eb07c86
 		summarizeBy: none
-		sourceColumn: AccountDescription
+		sourceColumn: AccountDesc
 
 		annotation SummarizationSetBy = Automatic
 
@@ -105,9 +105,10 @@ table DimAccount
 				let
 				    Source = Csv.Document(File.Contents("P:\Pearl Innovations\Fabric Project\Dimension_Tables\Cleanseddim\DimAccount.csv"),[Delimiter=",", Columns=10, Encoding=1252, QuoteStyle=QuoteStyle.None]),
 				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"AccountKey", Int64.Type}, {"ParentAccountKey", Int64.Type}, {"AccountCodeAlternateKey", Int64.Type}, {"ParentAccountCodeAlternateKey", Int64.Type}, {"AccountDescription", type text}, {"AccountType", type text}, {"Operator", type text}, {"CustomMembers", type text}, {"ValueType", type text}, {"CustomMemberOptions", type text}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"AccountKey", Int64.Type}, {"ParentAccountKey", Int64.Type}, {"AccountCodeAlternateKey", Int64.Type}, {"ParentAccountCodeAlternateKey", Int64.Type}, {"AccountDescription", type text}, {"AccountType", type text}, {"Operator", type text}, {"CustomMembers", type text}, {"ValueType", type text}, {"CustomMemberOptions", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"AccountDescription", "AccountDesc"}})
 				in
-				    #"Changed Type"
+				    #"Renamed Columns"
 
 	annotation PBI_ResultType = Table
 
